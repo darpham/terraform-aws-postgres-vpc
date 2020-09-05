@@ -1,8 +1,3 @@
-resource "aws_key_pair" "bastion" {
-  key_name   = var.key_name
-  public_key = var.public_key
-}
-
 data "aws_ami" "ami" {
   owners      = ["137112412989"]
   most_recent = true
@@ -84,13 +79,11 @@ module "bastion" {
   s3_bucket_name              = aws_s3_bucket.ssh_public_keys.id
   vpc_id                      = module.network.vpc_id
   subnet_ids                  = tolist(module.network.public_subnet_ids)
-  keys_update_frequency       = var.cron_key_update_schedule 
+  keys_update_frequency       = var.cron_key_update_schedule
   enable_hourly_cron_updates  = true
   apply_changes_immediately   = true
   associate_public_ip_address = true
-  allowed_security_groups = []
   ssh_user                    = "ec2-user"
-  # key_name                    = aws_key_pair.bastion.key_name
   additional_user_data_script = <<EOF
 printf "============================\n"
 printf "============================\n"

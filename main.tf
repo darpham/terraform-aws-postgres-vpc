@@ -1,10 +1,10 @@
 module "network" {
-  source = "git::https://github.com/jafow/terraform-modules.git//aws-blueprints/network?ref=network-0.1.2"
-  region = var.region
-  namespace = local.namespace
-  stage = var.stage
-  name = local.vpc_name
-  cidr_block = var.cidr_block
+  source             = "git::https://github.com/jafow/terraform-modules.git//aws-blueprints/network?ref=network-0.1.2"
+  region             = var.region
+  namespace          = local.namespace
+  stage              = var.stage
+  name               = local.vpc_name
+  cidr_block         = var.cidr_block
   availability_zones = var.availability_zones
 }
 
@@ -24,10 +24,10 @@ resource "aws_security_group" "db" {
 
   # allow ingress from bastion server
   ingress {
-    description = "inbound from bastion server"
-    from_port = 5432
-    to_port = 5432
-    protocol = "tcp"
+    description     = "inbound from bastion server"
+    from_port       = 5432
+    to_port         = 5432
+    protocol        = "tcp"
     security_groups = [module.bastion.security_group_id]
   }
 
