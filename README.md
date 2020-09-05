@@ -25,6 +25,8 @@ This module will do the following:
 
 ```hcl
 module "networked_rds" {
+  source = "git::https://github.com/100Automations/terraform-aws-postgres-vpc.git?ref=tags/v0.1.0"
+
   project_name = "ballotnav"
   stage = "dev"
   region = "us-west-2"
@@ -46,10 +48,9 @@ module "networked_rds" {
 | account\_id | the aws account id # that this is provisioned into | `string` | `""` | yes |
 | stage | a short name describing the lifecyle or stage of development that this is running for; ex: 'dev', 'qa', 'prod', 'test'| `string` | `"dev"` | no |
 | region | the aws region code where this is deployed; ex: 'us-west-2', 'us-east-1', 'us-east-2'| `string` | `""` | yes |
-| cidr_\block |The range of IP addresses this vpc will reside in| `string` | `"10.10.0.0/16"` | no |
+| cidr\_block |The range of IP addresses this vpc will reside in| `string` | `"10.10.0.0/16"` | no |
 | availability_zones |The region + identifiers for the zones that the vpc will cover. Ex: ['us-west-2a', 'us-west-2b', 'us-west-2c']. Varies between regions.| `string` | `""` | yes |
-| tags| key value map of tags applied to infrastructure | `map` |
-`{terraform_managed = "true"}` | no |
+| tags| key value map of tags applied to infrastructure | `map` | `{terraform_managed = "true"}` | no |
 | db\_username | The name of the default postgres user created by RDS when the instance is booted| `string` | `""` | yes |
 | db\_name |The name of the default postgres database created by RDS when the instance is booted | `string` | `""` | yes |
 | db\_password |The postgres database password created for the default database when the instance is booted. :warning: do not put this into git!| `string` | `""` | yes |
@@ -106,10 +107,40 @@ Finally run `terraform plan` and `terraform apply` and any public keys in that `
 
 #### connect to the Postgres database via the bastion server
 We can connect to the database via the bastion using [SSH local port
-forwarding](https://www.ssh.com/ssh/tunneling/example).
+forwarding](https://www.ssh.com/ssh/tunneling/example) or via PuTTy.
 
-Many database clients will have an option to configure a connection via SSH.
+Many database clients will have an option to configure a connection via SSH. A
+really excellent one that is cross-platform and free is
+[TablePlus](https://www.tableplus.io/).
 
 After successfully applying this blueprint terraform will output
 the `db_address` and the `eip_public_address` and these will be the values used
-to connect to postgres.
+to connect to postgres, along with the db username and password you entered upon
+creation.
+
+#### example: establing a connection via local port forwarding
+here's a minimal example of connecting via `ssh` and [`psql`](https://www.postgresql.org/docs/11/app-psql.html), postgres's built-in
+client.
+
+1. open two terminal shells. In one open the tunnel to the database via the
+   bastion:
+```bash
+ssh -i ~/.ssh/my-private-key -L
+5432:myrds-terraform-db.asdfjvasku.us-west-12rds.amazonaws.com:5432
+ec2-user@32.12.12.24
+```
+This will use the private key associated with the public key added to the
+bastion s3 bucket to connect to the db address via a tunnel to the bastion
+address (`32.12.12.24` in this example).
+
+2. In the second terminal test the connection the database with `psql`:
+
+```bash
+psql -U my_db_user -h localhost -p 5432 -d my_db_name
+Password for user my_db_user:
+```
+
+After entering the password it should be connected. 
+
+# TODO
+- [ ] add putty example
