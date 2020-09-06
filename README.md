@@ -144,3 +144,5 @@ After entering the password it should be connected.
 
 # TODO
 - [ ] add putty example
+- [ ] add option for creating a dns record for the bastion server so we can have
+  nice hostname instead of the elastic ip.
