@@ -27,6 +27,11 @@ output db_instance_endpoint {
   value       = module.db.this_db_instance_endpoint
 }
 
+output db_security_group_id {
+  description = "The security group id for this RDS instance"
+  value = aws_security_group.db.id
+}
+
 output network_public_subnet_ids {
   description = "public vpc subnets"
   value       = module.network.public_subnet_ids
