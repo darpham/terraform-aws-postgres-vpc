@@ -1,3 +1,7 @@
+provider "aws" {
+  region  = var.region
+}
+
 module "networked_rds" {
   source = "./.."
 
@@ -16,4 +20,8 @@ module "networked_rds" {
 
 variable db_password {
   description = "The postgres database password created for the default database when the instance is booted"
+}
+
+variable region {
+  description = "The AWS region where infrastructure is to be deployed"
 }

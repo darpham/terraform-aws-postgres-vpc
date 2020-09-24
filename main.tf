@@ -1,7 +1,3 @@
-provider "aws" {
-  region  = var.region
-}
-
 module "network" {
   source             = "git::https://github.com/jafow/terraform-modules.git//aws-blueprints/network?ref=network-0.1.2"
   region             = var.region
