@@ -58,7 +58,7 @@ data "aws_iam_policy_document" "s3_readonly_policy" {
 }
 
 resource "aws_iam_role_policy" "s3_readonly_policy" {
-  name = "s3_readonly-policy"
+  name_prefix = "s3_readonly-policy"
   role = aws_iam_role.s3_readonly.id
 
   policy = data.aws_iam_policy_document.s3_readonly_policy.json
