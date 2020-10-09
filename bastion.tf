@@ -20,12 +20,12 @@ data "aws_ami" "ami" {
 
 
 resource "aws_iam_instance_profile" "s3_readonly" {
-  name = "s3_readonly"
+  name_prefix = "s3_readonly"
   role = aws_iam_role.s3_readonly.name
 }
 
 resource "aws_iam_role" "s3_readonly" {
-  name = "s3_readonly"
+  name_prefix = "s3_readonly"
   path = "/"
 
   assume_role_policy = <<EOF
