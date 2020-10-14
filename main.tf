@@ -47,6 +47,7 @@ module "db" {
   version    = "~> 2.0"
   identifier = "${local.db_name}-${var.stage}"
 
+  allow_major_version_upgrade = var.db_allow_major_engine_version_upgrade
   engine            = "postgres"
   engine_version    = var.db_engine_version
   instance_class    = var.db_instance_class
@@ -73,10 +74,10 @@ module "db" {
   subnet_ids = tolist(module.network.private_subnet_ids)
 
   # DB parameter group
-  family = "postgres11"
+  family = "postgres${var.db_major_version}"
 
   # DB option group
-  major_engine_version = "11"
+  major_engine_version = var.db_major_version
 
   # Database Deletion Protection
   deletion_protection = false
