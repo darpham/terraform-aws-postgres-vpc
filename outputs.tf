@@ -39,7 +39,7 @@ output network_public_subnet_ids {
 
 output network_private_subnet_ids {
   description = "private vpc subnets"
-  value       = module.network.public_subnet_ids
+  value       = module.network.private_subnet_ids
 }
 
 output bastion_ssh_public_keys_bucket {
