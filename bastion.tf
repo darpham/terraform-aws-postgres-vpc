@@ -20,7 +20,7 @@ data "aws_ami" "ami" {
 
 
 resource "aws_iam_instance_profile" "s3_readonly" {
-  name_prefix = "s3_readonly"
+  name_prefix = "s3_ro"
   role = aws_iam_role.s3_readonly.name
 }
 
@@ -75,7 +75,7 @@ module "bastion" {
   ami                         = data.aws_ami.ami.id
   eip                         = aws_eip.eip.public_ip
   region                      = var.region
-  iam_instance_profile        = "s3_readonly"
+  iam_instance_profile        = aws_iam_instance_profile.s3_readonly.name
   s3_bucket_name              = aws_s3_bucket.ssh_public_keys.id
   vpc_id                      = module.network.vpc_id
   subnet_ids                  = tolist(module.network.public_subnet_ids)
