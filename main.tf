@@ -48,7 +48,7 @@ module "db" {
   identifier = "${local.db_name}-${var.stage}"
 
   engine            = "postgres"
-  engine_version    = "11.8"
+  engine_version    = var.db_engine_version
   instance_class    = var.db_instance_class
   allocated_storage = 20
 

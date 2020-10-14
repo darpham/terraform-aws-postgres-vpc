@@ -57,6 +57,10 @@ variable db_instance_class {
   description = "The instance type of the db; defaults to db.t2.small"
   default     = "db.t2.small"
 }
+variable db_engine_version {
+  description = "the semver major and minor version of postgres; default to 11.8"
+  default = "11.8"
+}
 
 variable ssh_public_key_names {
   description = "the name of the public key files in ./public_keys without the file extension; example ['alice', 'bob', 'carol']"
