@@ -32,6 +32,11 @@ output db_security_group_id {
   value = aws_security_group.db.id
 }
 
+output network_vpc_id {
+  description = "The id of the newly created VPC"
+  value       = module.network.vpc_id
+}
+
 output network_public_subnet_ids {
   description = "public vpc subnets"
   value       = module.network.public_subnet_ids
