@@ -88,7 +88,4 @@ module "db" {
   # Database Deletion Protection
   deletion_protection = false
 
-  lifecycle {
-    ignore_changes = [snapshot_identifier]
-  }
 }
