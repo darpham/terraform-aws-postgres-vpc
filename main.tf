@@ -41,6 +41,10 @@ resource "aws_security_group" "db" {
   }
 }
 
+data "aws_db_snapshot" "latest_db_snapshot" {
+  db_instance_identifier = var.db_instance_id_migration
+  most_recent            = true
+}
 
 module "db" {
   source     = "terraform-aws-modules/rds/aws"
@@ -57,6 +61,8 @@ module "db" {
   username = var.db_username
   password = var.db_password
   port     = "5432"
+
+  snapshot_identifier = aws_db_snapshot.latest_db_snapshot.id
 
   vpc_security_group_ids = [aws_security_group.db.id]
 
@@ -81,4 +87,8 @@ module "db" {
 
   # Database Deletion Protection
   deletion_protection = false
+
+  lifecycle {
+    ignore_changes = [snapshot_identifier]
+  }
 }

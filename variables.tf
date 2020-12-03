@@ -2,6 +2,15 @@ variable project_name {
   description = "The overall name of the project using this infrastructure; used to group related resources by"
 }
 
+variable db_instance_id_migration {
+  description = "The database ID from which the new database will start using the latest snapshot"
+}
+
+variable db_migration_flag {
+  description = "Flag to determine if new RDS instance will pull data from snapshot"
+  default = 1
+}
+
 variable allowed_security_groups {
   description = "security group ids that are allowed to the bastion server"
   type        = list(string)
