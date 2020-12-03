@@ -62,7 +62,7 @@ module "db" {
   password = var.db_password
   port     = "5432"
 
-  snapshot_identifier = aws_db_snapshot.latest_db_snapshot.id
+  snapshot_identifier = data.aws_db_snapshot.latest_db_snapshot.id
 
   vpc_security_group_ids = [aws_security_group.db.id]
 
