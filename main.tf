@@ -4,7 +4,6 @@ provider "aws" {
 }
 
 module "network" {
-  // source             = "git::https://github.com/jafow/terraform-modules.git//aws-blueprints/network?ref=network-0.1.2"
   source             = "./network"
   region             = var.region
   namespace          = substr(var.project_name, 0, 6)
@@ -15,7 +14,6 @@ module "network" {
 }
 
 module "rds" {
-  // source = "git::https://github.com/darpham/terraform-aws-postgres-vpc.git"
   source = "./rds"
 
   project_name = var.project_name
@@ -72,8 +70,6 @@ module "ecs" {
   aws_ssm_db_password_arn   = module.rds.aws_ssm_db_password_arn
   alb_security_group_id     = module.applicationlb.security_group_id
   alb_target_group_arn      = module.applicationlb.alb_target_group_arn
-  // aws_alb = module.applicationlb.aws_alb_var
-  // alb_lb_listener_http = module.applicationlb.alb_lb_listener_http_var
 
   // Input from Variables
   account_id = var.account_id

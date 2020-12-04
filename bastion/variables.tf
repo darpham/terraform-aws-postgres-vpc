@@ -1,4 +1,6 @@
-variable account_id {}
+variable account_id {
+  description = "AWS Account ID"
+}
 
 variable region {
   type        = string

@@ -17,4 +17,3 @@ output bastion_ssh_public_keys_bucket {
   description = "The name of the bucket where the bastion server gets its allowed public keys. Copy new users RSA public key to this bucket in order to grant them SSH access to the bastion."
   value       = aws_s3_bucket.ssh_public_keys.id
 }
-

@@ -20,7 +20,7 @@ variable stage {
 }
 
 variable tags {
-  default = {}
+  default = { terraform_managed = "true" }
   type    = map
 }
 
@@ -89,10 +89,17 @@ variable desired_count {
 // --------------------------
 // RDS/Database Variables
 // --------------------------
-variable db_name {}
-variable db_username {}
-variable db_password {}
+variable db_name {
+  description = "Name of the Database"
+}
+variable db_username {
+  description = "Databse Username"
+}
+variable db_password {
+  description = "Databse Password"
+}
 
+// DB Migration Variables (Under construction)
 variable db_instance_id_migration {
   description = "The database ID from which the new database will start using the latest snapshot"
   default     = "na"
@@ -125,6 +132,6 @@ variable cron_key_update_schedule {
 }
 
 variable ssh_public_key_names {
-  description = "the name of the public key files in ./public_keys without the file extension; example ['alice', 'bob', 'carol']"
+  description = "the name of the public key files in AWS S3 ./public_keys without the file extension; example ['alice', 'bob', 'carol']"
   type        = list(string)
 }

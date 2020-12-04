@@ -8,29 +8,25 @@ variable vpc_id {
 
 variable region {
   type    = string
-  default = "us-east-2"
 }
 
 variable stage {
   type    = string
-  default = "dev"
 }
 
 variable tags {
-  default = {}
+  default = { terraform_managed = "true" }
   type    = map
 }
 
 variable container_port {
   type    = number
-  default = 5000
 }
 
 variable task_name {
   type    = string
-  default = "foodoasis-task"
 }
 
 variable public_subnet_ids {
-
+  description = "Public Subnets for where the ALB will be associated with"
 }

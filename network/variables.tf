@@ -21,6 +21,6 @@ variable "stage" {
 variable "cidr_block" { type = string }
 
 variable tags {
+  default = { terraform_managed = "true" }
   type    = map
-  default = {}
 }

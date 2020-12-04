@@ -1,3 +1,6 @@
+// --------------------------
+// Global/General Variables
+// --------------------------
 variable account_id {
   description = "AWS Account ID"
 }
@@ -16,6 +19,14 @@ variable vpc_id {
   description = "VPC ID"
 }
 
+variable tags {
+  default = { terraform_managed = "true" }
+  type    = map
+}
+
+// --------------------------
+// ECS/Fargat Variables
+// --------------------------
 variable container_cpu {
   type    = number
   default = 256
@@ -59,11 +70,6 @@ variable image_tag {
 variable desired_count {
   default = 1
   type    = number
-}
-
-variable tags {
-  default = {}
-  type    = map
 }
 
 variable aws_ssm_db_hostname_arn {
