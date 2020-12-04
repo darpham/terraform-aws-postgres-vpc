@@ -1,5 +1,11 @@
+provider "aws" {
+  version = "2.64.0"
+  region = var.region
+}
+
 module "network" {
-  source             = "git::https://github.com/jafow/terraform-modules.git//aws-blueprints/network?ref=network-0.1.2"
+  // source             = "git::https://github.com/jafow/terraform-modules.git//aws-blueprints/network?ref=network-0.1.2"
+  source             = "./network"
   region             = var.region
   namespace          = local.namespace
   stage              = var.stage
@@ -41,9 +47,16 @@ resource "aws_security_group" "db" {
   }
 }
 
-data "aws_db_snapshot" "latest_db_snapshot" {
+// Pull latest existing snapshot for DB
+// data "aws_db_snapshot" "latest_db_snapshot" {
+//   db_instance_identifier = var.db_instance_id_migration
+//   most_recent            = true
+// }
+
+resource "aws_db_snapshot" "test" {
   db_instance_identifier = var.db_instance_id_migration
-  most_recent            = true
+  db_snapshot_identifier = "terraform-migration"
+  tags = merge(var.tags, local.datetime)
 }
 
 module "db" {
@@ -62,7 +75,8 @@ module "db" {
   password = var.db_password
   port     = "5432"
 
-  snapshot_identifier = data.aws_db_snapshot.latest_db_snapshot.id
+  // snapshot_identifier = data.aws_db_snapshot.latest_db_snapshot.id
+  snapshot_identifier = var.db_snapshot_migration
 
   vpc_security_group_ids = [aws_security_group.db.id]
 
@@ -87,5 +101,5 @@ module "db" {
 
   # Database Deletion Protection
   deletion_protection = false
-
+  
 }

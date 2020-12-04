@@ -6,6 +6,14 @@ variable db_instance_id_migration {
   description = "The database ID from which the new database will start using the latest snapshot"
 }
 
+variable db_instance_region_migration {
+  description = "The database ID from which the new database will start using the latest snapshot"
+}
+
+variable db_snapshot_migration {
+  description = "Name of snapshot that will used to for new database"
+}
+
 variable db_migration_flag {
   description = "Flag to determine if new RDS instance will pull data from snapshot"
   default = 1
