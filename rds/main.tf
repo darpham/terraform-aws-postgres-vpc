@@ -42,12 +42,11 @@ resource "aws_security_group" "db" {
 //   db_instance_identifier = var.db_instance_id_migration
 //   most_recent            = true
 // }
-
-resource "aws_db_snapshot" "test" {
-  db_instance_identifier = var.db_instance_id_migration
-  db_snapshot_identifier = "terraform-migration"
-  tags                   = merge(var.tags, var.datetime)
-}
+// resource "aws_db_snapshot" "test" {
+//   db_instance_identifier = var.db_instance_id_migration
+//   db_snapshot_identifier = "terraform-migration"
+//   tags                   = merge(var.tags, var.datetime)
+// }
 
 module "db" {
   source     = "terraform-aws-modules/rds/aws"
