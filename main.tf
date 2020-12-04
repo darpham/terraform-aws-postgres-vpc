@@ -1,105 +1,111 @@
 provider "aws" {
   version = "2.64.0"
-  region = var.region
+  region  = var.region
 }
 
 module "network" {
   // source             = "git::https://github.com/jafow/terraform-modules.git//aws-blueprints/network?ref=network-0.1.2"
   source             = "./network"
   region             = var.region
-  namespace          = local.namespace
+  namespace          = substr(var.project_name, 0, 6)
   stage              = var.stage
-  name               = local.vpc_name
+  name               = "${var.project_name}-${var.stage}vpc"
   cidr_block         = var.cidr_block
   availability_zones = var.availability_zones
 }
 
-resource "aws_security_group" "db" {
-  name_prefix = substr(local.db_name, 0, 6)
-  description = "Ingress and egress for ${local.db_name} RDS"
-  vpc_id      = module.network.vpc_id
-  tags        = merge({ Name = local.db_name }, var.tags)
+module "rds" {
+  // source = "git::https://github.com/darpham/terraform-aws-postgres-vpc.git"
+  source = "./rds"
 
-  ingress {
-    description = "db ingress from private subnets"
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    cidr_blocks = tolist(module.network.private_subnet_cidrs)
-  }
+  project_name = var.project_name
+  stage        = var.stage
+  region       = var.region
+  datetime     = local.datetime
 
-  # allow ingress from bastion server
-  ingress {
-    description     = "inbound from bastion server"
-    from_port       = 5432
-    to_port         = 5432
-    protocol        = "tcp"
-    security_groups = [module.bastion.security_group_id]
-  }
+  db_username = var.db_username
+  db_name     = var.db_name
+  db_password = var.db_password
 
-  egress {
-    description = "db egress to private subnets"
-    self        = true
-    from_port   = 22
-    to_port     = 65535
-    protocol    = "tcp"
-    cidr_blocks = tolist(module.network.private_subnet_cidrs)
-  }
+  // Use either instance to pull latest snaphsot for DB
+  // !! Does not currently work if AWS Provider is in a different region
+  db_instance_id_migration     = var.db_instance_id_migration
+  db_instance_region_migration = var.db_instance_region_migration
+
+  // OR specify snapshot directly
+  db_snapshot_migration = var.db_snapshot_migration
+
+  // Module Network variables
+  vpc_id                    = module.network.vpc_id
+  private_subnet_ids        = module.network.private_subnet_ids
+  private_subnet_cidrs      = module.network.private_subnet_cidrs
+  bastion_security_group_id = module.bastion.security_group_id
 }
 
-// Pull latest existing snapshot for DB
-// data "aws_db_snapshot" "latest_db_snapshot" {
-//   db_instance_identifier = var.db_instance_id_migration
-//   most_recent            = true
-// }
+module "applicationlb" {
+  source = "./applicationlb"
 
-resource "aws_db_snapshot" "test" {
-  db_instance_identifier = var.db_instance_id_migration
-  db_snapshot_identifier = "terraform-migration"
-  tags = merge(var.tags, local.datetime)
+  // Input from other Modules
+  vpc_id            = module.network.vpc_id
+  public_subnet_ids = module.network.public_subnet_ids
+
+  // Input from Variables
+  account_id = var.account_id
+  region     = var.region
+  stage      = var.stage
+
+  // Container Variables
+  container_port = var.container_port
+  task_name      = var.task_name
+  tags           = var.tags
 }
 
-module "db" {
-  source     = "terraform-aws-modules/rds/aws"
-  version    = "~> 2.0"
-  identifier = "${local.db_name}-${var.stage}"
+module "ecs" {
+  source = "./ecs-fargate"
 
-  allow_major_version_upgrade = var.db_allow_major_engine_version_upgrade
-  engine            = "postgres"
-  engine_version    = var.db_engine_version
-  instance_class    = var.db_instance_class
-  allocated_storage = 20
+  // Input from other Modules
+  vpc_id                    = module.network.vpc_id
+  public_subnet_ids         = module.network.public_subnet_ids
+  db_security_group_id      = module.rds.db_security_group_id
+  bastion_security_group_id = module.bastion.security_group_id
+  aws_ssm_db_hostname_arn   = module.rds.aws_ssm_db_hostname_arn
+  aws_ssm_db_password_arn   = module.rds.aws_ssm_db_password_arn
+  alb_security_group_id     = module.applicationlb.security_group_id
+  alb_target_group_arn      = module.applicationlb.alb_target_group_arn
+  // aws_alb = module.applicationlb.aws_alb_var
+  // alb_lb_listener_http = module.applicationlb.alb_lb_listener_http_var
 
-  name     = var.db_name
-  username = var.db_username
-  password = var.db_password
-  port     = "5432"
+  // Input from Variables
+  account_id = var.account_id
+  region     = var.region
+  stage      = var.stage
 
-  // snapshot_identifier = data.aws_db_snapshot.latest_db_snapshot.id
-  snapshot_identifier = var.db_snapshot_migration
+  // Container Variables
+  desired_count    = var.desired_count
+  container_memory = var.container_memory
+  container_cpu    = var.container_cpu
+  container_port   = var.container_port
+  container_name   = var.container_name
+  cluster_name     = var.cluster_name
+  task_name        = var.task_name
+  image_tag        = var.image_tag
 
-  vpc_security_group_ids = [aws_security_group.db.id]
+  depends_on = [ module.applicationlb ]
+}
 
-  maintenance_window = "Mon:00:00-Mon:03:00"
-  backup_window      = "03:00-06:00"
+module "bastion" {
+  source = "./bastion"
 
-  # disable backups to create DB faster
-  backup_retention_period = 0
+  // Input from other Modules
+  vpc_id            = module.network.vpc_id
+  public_subnet_ids = module.network.public_subnet_ids
 
-  tags = var.tags
+  // Input from Variables
+  account_id = var.account_id
+  region     = var.region
 
-  enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
-
-  # DB subnet group
-  subnet_ids = tolist(module.network.private_subnet_ids)
-
-  # DB parameter group
-  family = "postgres${var.db_major_version}"
-
-  # DB option group
-  major_engine_version = var.db_major_version
-
-  # Database Deletion Protection
-  deletion_protection = false
-  
+  bastion_name             = "bastion-${var.project_name}-${var.stage}"
+  bastion_instance_type    = var.bastion_instance_type
+  cron_key_update_schedule = var.cron_key_update_schedule
+  ssh_public_key_names     = var.ssh_public_key_names
 }

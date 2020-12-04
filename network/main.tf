@@ -1,3 +1,8 @@
+provider "aws" {
+  version = "2.64.0"
+  region  = var.region
+}
+
 // Module starter code: https://github.com/jafow/terraform-modules/tree/master/aws-blueprints/network
 module "vpc" {
   source     = "git::https://github.com/cloudposse/terraform-aws-vpc.git?ref=0.18.0"

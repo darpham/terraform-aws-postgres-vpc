@@ -1,7 +1,6 @@
 locals {
-  bastion_name = "bastion-${var.account_id}-${local.namespace}-${var.stage}"
-  vpc_name     = "main-vpc"
-  namespace    = substr(var.project_name, 0, 6)
-  db_name      = "${var.project_name}-db"
-  datetime = { date_processed = formatdate("YYYYMMDDhhmmss", timestamp()) }
+  // Only add local variables if it would be much cleaner vs re-entering the value
+
+  // datetime is going to be added to tags for terraform creation date, lives here because it needs to...
+  datetime     = { date_processed = formatdate("YYYYMMDDhhmmss", timestamp()) }
 }

@@ -37,16 +37,6 @@ output "private_route_table_ids" {
   value       = module.subnets.private_route_table_ids
 }
 
-output "nat_gateway_ids" {
-  description = "IDs of the NAT Gateways created"
-  value       = module.subnets.nat_gateway_ids
-}
-
-output "nat_instance_ids" {
-  description = "IDs of the NAT Instances created"
-  value       = module.subnets.nat_instance_ids
-}
-
 output "availability_zones" {
   description = "List of Availability Zones where subnets were created"
   value       = var.availability_zones
