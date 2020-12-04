@@ -19,14 +19,14 @@ module "bastion" {
   associate_public_ip_address = true
   ssh_user                    = "ec2-user"
   additional_user_data_script = <<EOF
-printf "============================\n"
-printf "============================\n"
-printf "============================\n"
-printf "============================\n"
-REGION=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | grep region | awk -F\" '{print $4}')
-INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
-aws ec2 associate-address --region $REGION --instance-id $INSTANCE_ID --allocation-id ${aws_eip.eip.id}
-EOF
+  printf "============================\n"
+  printf "============================\n"
+  printf "============================\n"
+  printf "============================\n"
+  REGION=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | grep region | awk -F\" '{print $4}')
+  INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
+  aws ec2 associate-address --region $REGION --instance-id $INSTANCE_ID --allocation-id ${aws_eip.eip.id}
+  EOF
 }
 
 data "aws_ami" "ami" {
