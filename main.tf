@@ -103,5 +103,5 @@ module "bastion" {
   bastion_name             = "bastion-${var.project_name}-${var.stage}"
   bastion_instance_type    = var.bastion_instance_type
   cron_key_update_schedule = var.cron_key_update_schedule
-  ssh_public_key_names     = var.ssh_public_key_names
+  github_usernames     = var.ssh_public_key_names
 }
